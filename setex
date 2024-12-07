@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# List all files in current directory
+SCRIPTS=($(ls))
+
+# Ask user to select a script or update all
+echo "Select a script to update or choose 'All' to update all scripts:"
+select SCRIPT in "All" "${SCRIPTS[@]}"; do
+  if [[ "$SCRIPT" == "All" ]]; then
+    for SCRIPT in "${SCRIPTS[@]}"; do
+      if [[ -f "$SCRIPT" ]]; then
+        # Run chmod +x on the script
+        chmod +x "$SCRIPT"
+        echo "Successfully made $SCRIPT executable"
+
+        # Copy the script to the /usr/local/bin directory
+        echo "Please enter your password to copy $SCRIPT to /usr/local/bin"
+        sudo cp "$SCRIPT" /usr/local/bin/
+        echo "Successfully copied $SCRIPT to /usr/local/bin"
+      fi
+    done
+    break
+  elif [[ -n "$SCRIPT" ]]; then
+    echo "You selected: $SCRIPT"
+    # Run chmod +x on the selected script
+    chmod +x "$SCRIPT"
+    echo "Successfully made $SCRIPT executable"
+
+    # Copy the script to the /usr/local/bin directory
+    echo "Please enter your password to copy $SCRIPT to /usr/local/bin"
+    sudo cp "$SCRIPT" /usr/local/bin/
+    echo "Successfully copied $SCRIPT to /usr/local/bin"
+    break
+  fi
+done
