@@ -118,6 +118,60 @@ function remove_remote() {
     done
 }
 
+# Function to edit a remote
+function edit_remote() {
+    CONNECTIONS=($(cat $CONNECTIONS_FILE | grep '^conn:' | cut -d' ' -f2-))
+    
+    echo "Select connection to edit:"
+    select CONNECTION in "${CONNECTIONS[@]}"; do
+        if [[ -n "$CONNECTION" ]]; then
+            # Get current values
+            CURR_ADDR=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; print $2}' "$CONNECTIONS_FILE")
+            CURR_PORT=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; print $2}' "$CONNECTIONS_FILE")
+            CURR_USER=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; getline; print $2}' "$CONNECTIONS_FILE")
+            CURR_PASS=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; getline; getline; print $2}' "$CONNECTIONS_FILE")
+            CURR_PKEY=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; getline; getline; getline; print $2}' "$CONNECTIONS_FILE")
+
+            # Prompt for new values, using current values as defaults
+            read -p "Address [$CURR_ADDR]: " addr
+            read -p "Port [$CURR_PORT]: " port
+            read -p "Username [$CURR_USER]: " user
+            read -p "Password [$CURR_PASS]: " pass
+            read -p "Private key filename [$CURR_PKEY]: " pkey
+
+            # Use current values if no new input
+            addr=${addr:-$CURR_ADDR}
+            port=${port:-$CURR_PORT}
+            user=${user:-$CURR_USER}
+            pass=${pass:-$CURR_PASS}
+            pkey=${pkey:-$CURR_PKEY}
+
+            # Create temporary file
+            temp_file=$(mktemp)
+            
+            # Replace the connection block
+            awk -v conn="$CONNECTION" -v addr="$addr" -v port="$port" \
+                -v user="$user" -v pass="$pass" -v pkey="$pkey" '
+                $0 ~ "^conn: " conn {
+                    print $0
+                    print "  addr:", addr
+                    print "  port:", port
+                    print "  user:", user
+                    print "  pass:", pass
+                    print "  pkey:", pkey
+                    print ""
+                    for(i=0; i<=5; i++) getline
+                    next
+                }
+                {print}
+            ' "$CONNECTIONS_FILE" > "$temp_file"
+            mv "$temp_file" "$CONNECTIONS_FILE"
+            echo "Remote '$CONNECTION' updated successfully!"
+            break
+        fi
+    done
+}
+
 # Main command parser
 case "${1:-help}" in
     "go"|"connect")
@@ -129,6 +183,9 @@ case "${1:-help}" in
     "remove"|"rm")
         remove_remote
         ;;
+    "edit")
+        edit_remote
+        ;;
     "list"|"ls")
         cat "$CONNECTIONS_FILE"
         ;;
@@ -139,6 +196,7 @@ case "${1:-help}" in
         echo "  go, connect   Connect to a remote"
         echo "  add           Add a new remote"
         echo "  remove, rm    Remove a remote"
+        echo "  edit          Edit an existing remote"
         echo "  list, ls      List all remotes"
         echo "  help          Show this help message (default)"
         ;;
