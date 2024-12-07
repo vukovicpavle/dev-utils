@@ -9,7 +9,8 @@ function connect_remote() {
     CONNECTIONS=($(cat $CONNECTIONS_FILE | grep '^conn:' | cut -d' ' -f2-))
 
     # Ask user to select a connection
-    echo "Select a connection:"
+    echo "🔌 Select a connection:"
+    echo "-------------------"
     select CONNECTION in "${CONNECTIONS[@]}"; do
         if [[ -n "$CONNECTION" ]]; then
             # Store the selected connection config in variables
@@ -22,11 +23,11 @@ function connect_remote() {
             # Check if there is a password
             if [[ -n "$PASS" ]]; then
                 # Ask user if they want their password printed
-                read -p "Do you want your password printed? (y/n): " PRINT_PASS
+                read -p "🔑 Show password? (y/n): " PRINT_PASS
 
                 # echo the password if the user wants it printed
                 if [[ "$PRINT_PASS" == "y" ]]; then
-                    echo "PASS: $PASS"
+                    echo "   Password: $PASS"
                 fi
             fi
 
@@ -50,16 +51,17 @@ function connect_remote() {
             fi
 
             # Print the ssh command
-            echo "SSH_COMMAND: $SSH_COMMAND"
-
+            echo "📡 Connection details:"
+            echo "   Command: $SSH_COMMAND"
 
             # Ask user if they want to run the SSH command
-            read -p "Do you want to run the SSH command? (y/n): " RUN_COMMAND
+            read -p "🚀 Connect now? (y/n): " RUN_COMMAND
             if [[ "$RUN_COMMAND" == "y" ]]; then
+                echo "   Connecting..."
                 # Execute the ssh command
                 eval $SSH_COMMAND
             else
-                echo "SSH command not executed."
+                echo "� Connection cancelled"
             fi
 
             # Exit
@@ -70,12 +72,14 @@ function connect_remote() {
 
 # Function to add a new remote
 function add_remote() {
-    read -p "Connection name: " conn
-    read -p "Address: " addr
-    read -p "Port (default: 22): " port
-    read -p "Username: " user
-    read -p "Password (optional): " pass
-    read -p "Private key filename (optional): " pkey
+    echo "➕ Add new connection"
+    echo "------------------"
+    read -p "   Name: " conn
+    read -p "   Address: " addr
+    read -p "   Port (default: 22): " port
+    read -p "   Username: " user
+    read -p "   Password (optional): " pass
+    read -p "   Private key filename (optional): " pkey
 
     # Use default port if none provided
     port=${port:-22}
@@ -91,20 +95,21 @@ function add_remote() {
         echo ""
     } >> "$CONNECTIONS_FILE"
     
-    echo "Remote '$conn' added successfully!"
+    echo "� Remote '$conn' added successfully!"
 }
 
 # Function to remove a remote
 function remove_remote() {
     CONNECTIONS=($(cat $CONNECTIONS_FILE | grep '^conn:' | cut -d' ' -f2-))
     
-    echo "Select connection to remove:"
+    echo "🗑️  Select connection to remove:"
+    echo "---------------------------"
     select CONNECTION in "${CONNECTIONS[@]}"; do
         if [[ -n "$CONNECTION" ]]; then
             # Add confirmation dialog
-            read -p "Are you sure you want to remove '$CONNECTION'? (y/n): " CONFIRM
+            read -p "⚠️  Are you sure you want to remove '$CONNECTION'? (y/n): " CONFIRM
             if [[ "$CONFIRM" != "y" ]]; then
-                echo "Operation cancelled."
+                echo "   Operation cancelled"
                 break
             fi
             
@@ -119,7 +124,7 @@ function remove_remote() {
                 {print}
             ' "$CONNECTIONS_FILE" > "$temp_file"
             mv "$temp_file" "$CONNECTIONS_FILE"
-            echo "Remote '$CONNECTION' removed successfully!"
+            echo "� Remote '$CONNECTION' removed successfully!"
             break
         fi
     done
@@ -129,7 +134,8 @@ function remove_remote() {
 function edit_remote() {
     CONNECTIONS=($(cat $CONNECTIONS_FILE | grep '^conn:' | cut -d' ' -f2-))
     
-    echo "Select connection to edit:"
+    echo "✏️  Select connection to edit:"
+    echo "-------------------------"
     select CONNECTION in "${CONNECTIONS[@]}"; do
         if [[ -n "$CONNECTION" ]]; then
             # Get current values
@@ -139,12 +145,13 @@ function edit_remote() {
             CURR_PASS=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; getline; getline; print $2}' "$CONNECTIONS_FILE")
             CURR_PKEY=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; getline; getline; getline; print $2}' "$CONNECTIONS_FILE")
 
-            # Prompt for new values, using current values as defaults
-            read -p "Address [$CURR_ADDR]: " addr
-            read -p "Port [$CURR_PORT]: " port
-            read -p "Username [$CURR_USER]: " user
-            read -p "Password [$CURR_PASS]: " pass
-            read -p "Private key filename [$CURR_PKEY]: " pkey
+            echo "📝 Current values shown in brackets"
+            echo "--------------------------------"
+            read -p "   Address [$CURR_ADDR]: " addr
+            read -p "   Port [$CURR_PORT]: " port
+            read -p "   Username [$CURR_USER]: " user
+            read -p "   Password [$CURR_PASS]: " pass
+            read -p "   Private key [$CURR_PKEY]: " pkey
 
             # Use current values if no new input
             addr=${addr:-$CURR_ADDR}
@@ -173,7 +180,7 @@ function edit_remote() {
                 {print}
             ' "$CONNECTIONS_FILE" > "$temp_file"
             mv "$temp_file" "$CONNECTIONS_FILE"
-            echo "Remote '$CONNECTION' updated successfully!"
+            echo "� Remote '$CONNECTION' updated successfully!"
             break
         fi
     done
@@ -181,20 +188,18 @@ function edit_remote() {
 
 # Function to initialize the remote configuration
 function init_remote() {
-    # Create SSH directory if it doesn't exist
     if [[ ! -d "$SSH_DIR" ]]; then
         mkdir -p "$SSH_DIR"
         chmod 700 "$SSH_DIR"
-        echo "Created SSH directory: $SSH_DIR"
+        echo "📁 Created SSH directory: $SSH_DIR"
     fi
 
-    # Create connections file if it doesn't exist
     if [[ ! -f "$CONNECTIONS_FILE" ]]; then
         touch "$CONNECTIONS_FILE"
         chmod 600 "$CONNECTIONS_FILE"
-        echo "Created connections file: $CONNECTIONS_FILE"
+        echo "📄 Created connections file: $CONNECTIONS_FILE"
     else
-        echo "Configuration already initialized"
+        echo "⚠️  Configuration already initialized"
     fi
 }
 
@@ -218,23 +223,25 @@ function show_help() {
 
 # Function to list remotes
 function list_remotes() {
-    echo "Available connections:"
-    grep '^conn:' "$CONNECTIONS_FILE" | cut -d' ' -f2-
+    echo "� Available connections:"
+    echo "------------------------"
+    grep '^conn:' "$CONNECTIONS_FILE" | cut -d' ' -f2- | sed 's/^/  /'
 }
 
 # Function to backup remotes
 function backup_remotes() {
     BACKUP_FILE="$SSH_DIR/remotes_backup_$(date +%Y%m%d_%H%M%S)"
     cp "$CONNECTIONS_FILE" "$BACKUP_FILE"
-    echo "Backup created at: $BACKUP_FILE"
+    echo "💾 Backup created successfully!"
+    echo "   Location: $BACKUP_FILE"
 }
 
 # Function to test a remote connection
 function test_remote() {
-    # List and select connection similar to connect_remote
     CONNECTIONS=($(cat $CONNECTIONS_FILE | grep '^conn:' | cut -d' ' -f2-))
     
-    echo "Select a connection to test:"
+    echo "🔍 Select a connection to test:"
+    echo "----------------------------"
     select CONNECTION in "${CONNECTIONS[@]}"; do
         if [[ -n "$CONNECTION" ]]; then
             # Get connection details (similar to connect_remote)
@@ -249,11 +256,13 @@ function test_remote() {
             [[ -n "$PORT" ]] && TEST_COMMAND="$TEST_COMMAND -p $PORT"
             TEST_COMMAND="$TEST_COMMAND $USER@$ADDR exit"
 
-            echo "Testing connection to $CONNECTION..."
+            echo "🔄 Testing connection to $CONNECTION..."
+            echo "   $USER@$ADDR:$PORT"
             if eval $TEST_COMMAND >/dev/null 2>&1; then
                 echo "✅ Connection successful!"
             else
                 echo "❌ Connection failed!"
+                echo "   Try 'remote connect' for more details"
             fi
             break
         fi
@@ -262,8 +271,9 @@ function test_remote() {
 
 # Function to search remotes
 function search_remotes() {
-    read -p "Enter search term: " SEARCH_TERM
-    echo "Matching connections:"
+    read -p "🔎 Enter search term: " SEARCH_TERM
+    echo "📍 Matching connections:"
+    echo "---------------------"
     awk -v search="$SEARCH_TERM" '
         /^conn:/ {
             conn=$0
@@ -271,7 +281,7 @@ function search_remotes() {
             getline port
             getline user
             if (tolower(conn) ~ tolower(search) || tolower(addr) ~ tolower(search) || tolower(user) ~ tolower(search)) {
-                print conn
+                print "  " conn
             }
         }
     ' "$CONNECTIONS_FILE"
@@ -296,6 +306,15 @@ case "${1:-help}" in
         ;;
     "list"|"ls")
         list_remotes
+        ;;
+    "backup")
+        backup_remotes
+        ;;
+    "test")
+        test_remote
+        ;;
+    "search")
+        search_remotes
         ;;
     "help"|*)
         show_help
