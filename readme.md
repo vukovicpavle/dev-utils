@@ -1,4 +1,4 @@
-# Bash Utility Scripts
+# dev-utils - Bash Utility Scripts
 
 A collection of useful bash scripts for development workflow automation.
 
