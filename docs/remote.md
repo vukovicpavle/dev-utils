@@ -37,6 +37,82 @@ remote [command]
 - `search` - Search through remotes by name, address, or username
 - `import` - Import remotes from another file (coming soon)
 
+## Examples
+
+List available connections:
+
+```bash
+$ remote list
+📋 Available connections:
+------------------------
+  myserver
+  development
+  staging
+```
+
+Connect to a remote:
+
+```bash
+$ remote connect
+🔌 Select a connection:
+-------------------
+1) myserver
+2) development
+3) staging
+#? 1
+📡 Connection details:
+   Command: ssh user@myserver.com -p 22
+🚀 Connect now? (y/n): y
+   Connecting...
+```
+
+Add a new remote:
+
+```bash
+$ remote add
+➕ Add new connection
+------------------
+   Name: production
+   Address: prod.server.com
+   Port (default: 22): 2222
+   Username: admin
+   Password (optional):
+   Private key filename (optional): prod_key
+✅ Remote 'production' added successfully!
+```
+
+Test a connection:
+
+```bash
+$ remote test
+🔍 Select a connection to test:
+----------------------------
+1) myserver
+2) development
+#? 1
+🔄 Testing connection to myserver...
+   user@myserver.com:22
+✅ Connection successful!
+```
+
+Search for connections:
+
+```bash
+$ remote search
+🔎 Enter search term: dev
+📍 Matching connections:
+---------------------
+  conn: development
+```
+
+Create a backup:
+
+```bash
+$ remote backup
+💾 Backup created successfully!
+   Location: ~/.ssh/remotes_backup_20240101_120000
+```
+
 ## Configuration
 
 The utility stores configurations in `~/.ssh/remotes` with permissions set to 600 (user read/write only).
@@ -57,47 +133,11 @@ conn: connection_name
 Running `remote init` will:
 
 1. Create the ~/.ssh directory if it doesn't exist (with 700 permissions)
-2. Create the remotes configuration file if it doesn't exist (with 600 permissions)
+
+```bash
+$ remote init
+📁 Created SSH directory: ~/.ssh
+📄 Created connections file: ~/.ssh/remotes
+```
 
 This ensures proper security permissions for SSH-related files.
-
-### Examples
-
-List available connections:
-
-```bash
-$ remote list
-Available connections:
-myserver
-development
-staging
-```
-
-Test a connection:
-
-```bash
-$ remote test
-Select a connection to test:
-1) myserver
-2) development
-3) staging
-#? 1
-Testing connection to myserver...
-✅ Connection successful!
-```
-
-Search for connections:
-
-```bash
-$ remote search
-Enter search term: dev
-Matching connections:
-conn: development
-```
-
-Create a backup:
-
-```bash
-$ remote backup
-Backup created at: ~/.ssh/remotes_backup_20240101_120000
-```
