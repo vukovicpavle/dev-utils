@@ -1,4 +1,4 @@
-# gitget
+# gitget - Get All Remote Branches
 
 A utility script to synchronize your local repository with all remote branches.
 

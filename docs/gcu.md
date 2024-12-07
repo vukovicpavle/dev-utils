@@ -1,4 +1,4 @@
-# GCU (Git Config Update)
+# gcu - Git Change User
 
 A utility script to easily update your SSH configuration for Git.
 
