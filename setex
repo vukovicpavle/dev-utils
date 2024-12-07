@@ -14,7 +14,6 @@ select SCRIPT in "All" "${SCRIPTS[@]}"; do
         echo "Successfully made $SCRIPT executable"
 
         # Copy the script to the /usr/local/bin directory
-        echo "Please enter your password to copy $SCRIPT to /usr/local/bin"
         sudo cp "$SCRIPT" /usr/local/bin/
         echo "Successfully copied $SCRIPT to /usr/local/bin"
       fi
@@ -27,7 +26,6 @@ select SCRIPT in "All" "${SCRIPTS[@]}"; do
     echo "Successfully made $SCRIPT executable"
 
     # Copy the script to the /usr/local/bin directory
-    echo "Please enter your password to copy $SCRIPT to /usr/local/bin"
     sudo cp "$SCRIPT" /usr/local/bin/
     echo "Successfully copied $SCRIPT to /usr/local/bin"
     break
