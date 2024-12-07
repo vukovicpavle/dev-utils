@@ -4,15 +4,21 @@
 SSH_DIR="$HOME/.ssh"
 CONFIG_FILE="$SSH_DIR/config"
 
+# Print header
+echo "🔑 Git Change User"
+echo "====================="
+
 # Check if .ssh directory exists
 if [ ! -d "$SSH_DIR" ]; then
-  echo "Error: $SSH_DIR does not exist!"
+  echo "❌ Error: $SSH_DIR does not exist!"
+  echo "Please create an SSH directory first using: mkdir -p $SSH_DIR"
   exit 1
 fi
 
 # Check if config file exists
 if [ ! -f "$CONFIG_FILE" ]; then
-  echo "Error: $CONFIG_FILE does not exist!"
+  echo "❌ Error: $CONFIG_FILE does not exist!"
+  echo "Please create an SSH config file first: touch $CONFIG_FILE"
   exit 1
 fi
 
@@ -21,30 +27,36 @@ SSH_FILES=($(ls $SSH_DIR | grep -v '\.pub' | grep '^id_'))
 
 # Check if there are any files to choose from
 if [ ${#SSH_FILES[@]} -eq 0 ]; then
-  echo "No files found in $SSH_DIR (excluding .pub files)"
+  echo "❌ No SSH key files found in $SSH_DIR"
+  echo "Please generate an SSH key first using: ssh-keygen -t ed25519"
   exit 1
 fi
 
 # Display options to the user
-echo "Select a file to use for IdentityFile:"
+echo "📝 Available SSH Keys:"
+echo "---------------------"
 select FILENAME in "${SSH_FILES[@]}"; do
   if [[ -n "$FILENAME" ]]; then
-    echo "You selected: $FILENAME"
+    echo "✅ Selected: $FILENAME"
     NEW_USERNAME="$FILENAME"
     break
   else
-    echo "Invalid selection. Please try again."
+    echo "❌ Invalid selection. Please try again."
   fi
 done
 
 # Create a backup of the original config file
+echo "📑 Creating backup of SSH config..."
 cp "$CONFIG_FILE" "$CONFIG_FILE.bak"
 
 # Use sed to replace the username in the 'IdentityFile' line
+echo "🔄 Updating SSH config..."
 sed -i.bak "s|IdentityFile ~/.ssh/[a-zA-Z0-9_\-]*|IdentityFile ~/.ssh/$NEW_USERNAME|g" "$CONFIG_FILE"
 
-# Success message
-echo "Successfully updated IdentityFile path in $CONFIG_FILE to use $NEW_USERNAME"
-
-# Add to ssh
+# Add to ssh-agent
+echo "🔐 Adding key to SSH agent..."
 ssh-add $SSH_DIR/$FILENAME
+
+# Success message
+echo "✨ Successfully updated SSH config!"
+echo "📍 New IdentityFile path: ~/.ssh/$NEW_USERNAME"

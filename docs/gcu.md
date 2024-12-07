@@ -1,14 +1,21 @@
-# gcu - Git Change User
+# GCU (Git Config Update)
 
-Updates SSH identity file in your SSH config based on available SSH keys.
+A utility script to easily update your SSH configuration for Git.
+
+## Overview
+
+GCU (Git Change User) helps you manage your SSH keys by updating your SSH config file with the correct identity file. It provides an interactive interface to select from available SSH keys and automatically updates your SSH configuration.
 
 ## Features
 
-- Lists available SSH keys
-- Updates SSH identity file in your SSH config
+- 🔍 Automatically detects available SSH keys
+- 🔄 Interactive key selection
+- 📑 Automatic backup of SSH config
+- 🔐 Adds selected key to SSH agent
+- ✨ User-friendly interface with clear feedback
 
 ## Usage
 
 ```bash
-gcu
+./gcu
 ```
