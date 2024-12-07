@@ -1,7 +1,21 @@
 #!/bin/bash
 
-# List all files in current directory
-SCRIPTS=($(ls))
+# List only script files in current directory
+SCRIPTS=()
+for file in *; do
+    if [[ -f "$file" ]] && \
+       ( [[ "$file" =~ \.(sh|bash)$ ]] || \
+         [[ "$(head -n1 "$file" 2>/dev/null)" =~ ^#!(.*\/)(bash|sh|zsh)$ ]] )
+    then
+        SCRIPTS+=("$file")
+    fi
+done
+
+# If no scripts found, exit
+if [ ${#SCRIPTS[@]} -eq 0 ]; then
+    echo "No shell scripts found in current directory"
+    exit 1
+fi
 
 # Ask user to select a script or update all
 echo "Select a script to update or choose 'All' to update all scripts:"
