@@ -198,6 +198,26 @@ function init_remote() {
     fi
 }
 
+# Function to display help message
+function show_help() {
+    echo "Usage: remote [command]"
+    echo ""
+    echo "Commands:"
+    echo "  init          Initialize remote configuration"
+    echo "  go, connect   Connect to a remote"
+    echo "  add           Add a new remote"
+    echo "  remove, rm    Remove a remote"
+    echo "  edit          Edit an existing remote"
+    echo "  list, ls      List all remotes"
+    echo "  help          Show this help message (default)"
+}
+
+# Function to list remotes
+function list_remotes() {
+    echo "Available connections:"
+    grep '^conn:' "$CONNECTIONS_FILE" | cut -d' ' -f2-
+}
+
 # Main command parser
 case "${1:-help}" in
     "init")
@@ -216,21 +236,10 @@ case "${1:-help}" in
         edit_remote
         ;;
     "list"|"ls")
-        # Extract and display only connection names
-        echo "Available connections:"
-        grep '^conn:' "$CONNECTIONS_FILE" | cut -d' ' -f2-
+        list_remotes
         ;;
     "help"|*)
-        echo "Usage: remote [command]"
-        echo ""
-        echo "Commands:"
-        echo "  init          Initialize remote configuration"
-        echo "  go, connect   Connect to a remote"
-        echo "  add           Add a new remote"
-        echo "  remove, rm    Remove a remote"
-        echo "  edit          Edit an existing remote"
-        echo "  list, ls      List all remotes"
-        echo "  help          Show this help message (default)"
+        show_help
         ;;
 esac
 
