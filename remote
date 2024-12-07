@@ -216,7 +216,9 @@ case "${1:-help}" in
         edit_remote
         ;;
     "list"|"ls")
-        cat "$CONNECTIONS_FILE"
+        # Extract and display only connection names
+        echo "Available connections:"
+        grep '^conn:' "$CONNECTIONS_FILE" | cut -d' ' -f2-
         ;;
     "help"|*)
         echo "Usage: remote [command]"
