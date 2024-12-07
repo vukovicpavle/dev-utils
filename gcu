@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Define paths
+SSH_DIR="$HOME/.ssh"
+CONFIG_FILE="$SSH_DIR/config"
+
+# Check if .ssh directory exists
+if [ ! -d "$SSH_DIR" ]; then
+  echo "Error: $SSH_DIR does not exist!"
+  exit 1
+fi
+
+# Check if config file exists
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo "Error: $CONFIG_FILE does not exist!"
+  exit 1
+fi
+
+# List all files in ~/.ssh that don't have a .pub extension and start with 'id_'
+SSH_FILES=($(ls $SSH_DIR | grep -v '\.pub' | grep '^id_'))
+
+# Check if there are any files to choose from
+if [ ${#SSH_FILES[@]} -eq 0 ]; then
+  echo "No files found in $SSH_DIR (excluding .pub files)"
+  exit 1
+fi
+
+# Display options to the user
+echo "Select a file to use for IdentityFile:"
+select FILENAME in "${SSH_FILES[@]}"; do
+  if [[ -n "$FILENAME" ]]; then
+    echo "You selected: $FILENAME"
+    NEW_USERNAME="$FILENAME"
+    break
+  else
+    echo "Invalid selection. Please try again."
+  fi
+done
+
+# Create a backup of the original config file
+cp "$CONFIG_FILE" "$CONFIG_FILE.bak"
+
+# Use sed to replace the username in the 'IdentityFile' line
+sed -i.bak "s|IdentityFile ~/.ssh/[a-zA-Z0-9_\-]*|IdentityFile ~/.ssh/$NEW_USERNAME|g" "$CONFIG_FILE"
+
+# Success message
+echo "Successfully updated IdentityFile path in $CONFIG_FILE to use $NEW_USERNAME"
+
+# Add to ssh
+ssh-add $SSH_DIR/$FILENAME

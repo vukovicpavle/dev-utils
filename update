@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# List all files in current directory without the update.sh
+SCRIPTS=($(ls | grep -v 'update.sh'))
+
+# Ask user to select a script
+echo "Select a script to update:"
+select SCRIPT in "${SCRIPTS[@]}"; do
+  if [[ -n "$SCRIPT" ]]; then
+    echo "You selected: $SCRIPT"
+    break
+  fi
+done
+
+# Run chmod +x on the selected script
+chmod +x "$SCRIPT"
+
+# Print success message
+echo "Successfully made $SCRIPT executable"
+
+# Copy the script to the /usr/local/bin directory
+# Tell user that password is required
+echo "Please enter your password to copy $SCRIPT to /usr/local/bin"
+sudo cp "$SCRIPT" /usr/local/bin/
+
+# Print success message
+echo "Successfully copied $SCRIPT to /usr/local/bin"
