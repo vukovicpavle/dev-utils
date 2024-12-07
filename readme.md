@@ -13,3 +13,7 @@ A collection of useful bash scripts for development workflow automation.
 
 1. Clone this repository
 2. Make scripts executable by running `./setex`
+
+## License
+
+This project is licensed under the "DWTFYW" license. See [license](LICENSE) for details.
