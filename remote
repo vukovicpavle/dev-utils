@@ -179,8 +179,30 @@ function edit_remote() {
     done
 }
 
+# Function to initialize the remote configuration
+function init_remote() {
+    # Create SSH directory if it doesn't exist
+    if [[ ! -d "$SSH_DIR" ]]; then
+        mkdir -p "$SSH_DIR"
+        chmod 700 "$SSH_DIR"
+        echo "Created SSH directory: $SSH_DIR"
+    fi
+
+    # Create connections file if it doesn't exist
+    if [[ ! -f "$CONNECTIONS_FILE" ]]; then
+        touch "$CONNECTIONS_FILE"
+        chmod 600 "$CONNECTIONS_FILE"
+        echo "Created connections file: $CONNECTIONS_FILE"
+    else
+        echo "Configuration already initialized"
+    fi
+}
+
 # Main command parser
 case "${1:-help}" in
+    "init")
+        init_remote
+        ;;
     "go"|"connect")
         connect_remote
         ;;
@@ -200,6 +222,7 @@ case "${1:-help}" in
         echo "Usage: remote [command]"
         echo ""
         echo "Commands:"
+        echo "  init          Initialize remote configuration"
         echo "  go, connect   Connect to a remote"
         echo "  add           Add a new remote"
         echo "  remove, rm    Remove a remote"
