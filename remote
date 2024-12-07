@@ -11,6 +11,7 @@ function connect_remote() {
     # Ask user to select a connection
     echo "🔌 Select a connection:"
     echo "-------------------"
+    PS3="Type connection number: "
     select CONNECTION in "${CONNECTIONS[@]}"; do
         if [[ -n "$CONNECTION" ]]; then
             # Store the selected connection config in variables
@@ -104,6 +105,7 @@ function remove_remote() {
     
     echo "🗑️  Select connection to remove:"
     echo "---------------------------"
+    PS3="Type connection number: "
     select CONNECTION in "${CONNECTIONS[@]}"; do
         if [[ -n "$CONNECTION" ]]; then
             # Add confirmation dialog
@@ -136,6 +138,7 @@ function edit_remote() {
     
     echo "✏️  Select connection to edit:"
     echo "-------------------------"
+    PS3="Type connection number: "
     select CONNECTION in "${CONNECTIONS[@]}"; do
         if [[ -n "$CONNECTION" ]]; then
             # Get current values
@@ -242,6 +245,7 @@ function test_remote() {
     
     echo "🔍 Select a connection to test:"
     echo "----------------------------"
+    PS3="Type connection number: "
     select CONNECTION in "${CONNECTIONS[@]}"; do
         if [[ -n "$CONNECTION" ]]; then
             # Get connection details (similar to connect_remote)

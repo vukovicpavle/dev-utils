@@ -18,9 +18,11 @@ if [ ${#SCRIPTS[@]} -eq 0 ]; then
 fi
 
 # Ask user to select a script or update all
-echo "Select a script to update or choose 'All' to update all scripts:"
-select SCRIPT in "All" "${SCRIPTS[@]}"; do
-  if [[ "$SCRIPT" == "All" ]]; then
+echo "🔄 Select script to update:"
+echo "------------------------"
+PS3="Type script number: "
+select SCRIPT in "all" "${SCRIPTS[@]}"; do
+  if [[ "$SCRIPT" == "all" ]]; then
     for SCRIPT in "${SCRIPTS[@]}"; do
       if [[ -f "$SCRIPT" ]]; then
         # Run chmod +x on the script

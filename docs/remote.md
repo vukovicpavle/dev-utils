@@ -4,15 +4,13 @@ A command-line tool to manage and connect to SSH remotes.
 
 ## Features
 
-- Connect to saved SSH connections
-- Add new remote connections
-- Remove existing connections
-- Edit connection details
-- Support for password and key-based authentication
-- Initialize SSH configuration directory and files
-- Test connections without connecting
-- Search through saved connections
-- Backup configuration to timestamped files
+- 🔌 Connect to saved SSH remotes
+- ➕ Add new remote connections
+- 🗑️ Remove existing remotes
+- ✏️ Edit remote configurations
+- 🔍 Test remote connections
+- 💾 Backup remote configurations
+- 🔎 Search through remotes
 
 ## Usage
 
@@ -20,22 +18,18 @@ A command-line tool to manage and connect to SSH remotes.
 remote [command]
 ```
 
-### Basic Commands
+### Commands
 
-- `init` - Initialize remote configuration (creates ~/.ssh directory and remotes file)
-- `go`, `connect` - Connect to a saved remote
-- `add` - Add a new remote connection
-- `remove`, `rm` - Remove an existing connection
-- `edit` - Edit connection details
-- `list`, `ls` - List all connection names
+- `init` - Initialize remote configuration
+- `go`, `connect` - Connect to a remote
+- `add` - Add a new remote
+- `remove`, `rm` - Remove a remote
+- `edit` - Edit an existing remote
+- `list`, `ls` - List all remotes
+- `backup` - Backup remotes to timestamped file
+- `test` - Test connection to a remote
+- `search` - Search through remotes
 - `help` - Show help message (default)
-
-### Advanced Commands
-
-- `backup` - Create a timestamped backup of your remotes file
-- `test` - Test connection to a remote without actually connecting
-- `search` - Search through remotes by name, address, or username
-- `import` - Import remotes from another file (coming soon)
 
 ## Examples
 
