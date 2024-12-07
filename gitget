@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
-echo "🔍 Scanning remote branches..."
+# Print header
+echo "📦 Git Repository Getter"
+echo "======================="
 
 # Get all remote branches and track them
 git branch -r | grep -v '\->' | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" | while read remote; do 

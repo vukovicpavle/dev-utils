@@ -35,6 +35,7 @@ fi
 # Display options to the user
 echo "📝 Available SSH Keys:"
 echo "---------------------"
+PS3="Type key number: "
 select FILENAME in "${SSH_FILES[@]}"; do
   if [[ -n "$FILENAME" ]]; then
     echo "✅ Selected: $FILENAME"
