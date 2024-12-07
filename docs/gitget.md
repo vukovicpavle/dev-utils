@@ -1,14 +1,18 @@
-# gitget - Git Repository Branch Getter
+# gitget
 
-A utility script for getting all git branches from a remote repository.
+A utility script to synchronize your local repository with all remote branches.
 
-## Features
+## Description
 
-- Automatically fetches and pulls all remote branches
+`gitget` performs three main operations:
+
+1. Sets up tracking for all remote branches
+2. Fetches all remote branches
+3. Pulls updates from all branches
 
 ## Usage
 
-Inside the repository directory:
+Simply run:
 
 ```bash
 gitget
