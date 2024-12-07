@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# Inside the ~/.ssh directory
+# There is a file called remotes
+# It contains the following (example):
+
+# ```
+# conn: connection_name
+  # addr: 1.1.1.1
+  # port: 22
+  # user: username
+  # pass: password
+  # pkey: private_key_file_name
+# ```
+
+SSH_DIR="$HOME/.ssh"
+CONNECTIONS_FILE="$SSH_DIR/remotes"
+
+# List all the connection names (starts with conn:) and store them in an array
+CONNECTIONS=($(cat $CONNECTIONS_FILE | grep '^conn:' | cut -d' ' -f2-))
+
+# Ask user to select a connection
+echo "Select a connection:"
+select CONNECTION in "${CONNECTIONS[@]}"; do
+  if [[ -n "$CONNECTION" ]]; then
+    echo "You selected: $CONNECTION"
+    
+    # Store the selected connection config in variables
+    ADDR=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; print $2}' "$CONNECTIONS_FILE")
+    PORT=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; print $2}' "$CONNECTIONS_FILE")
+    USER=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; getline; print $2}' "$CONNECTIONS_FILE")
+    PASS=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; getline; getline; print $2}' "$CONNECTIONS_FILE")
+    PKEY=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; getline; getline; getline; print $2}' "$CONNECTIONS_FILE")
+
+    # Check if there is a password
+    if [[ -n "$PASS" ]]; then
+      # Ask user if they want their password printed
+      read -p "Do you want your password printed? (y/n): " PRINT_PASS
+
+      # echo the password if the user wants it printed
+      if [[ "$PRINT_PASS" == "y" ]]; then
+        echo "PASS: $PASS"
+      fi
+    fi
+
+    # Based on what is set, create the command (PKEY, USER, ADDR, PORT)
+    # Initiate the command
+    SSH_COMMAND="ssh"
+
+    # Add the pkey if it is set
+    if [[ -n "$PKEY" ]]; then
+      SSH_COMMAND="$SSH_COMMAND -i $SSH_DIR/$PKEY"
+    fi
+
+    # Add the port if it is set   
+    if [[ -n "$PORT" ]]; then
+      SSH_COMMAND="$SSH_COMMAND -p $PORT"
+    fi
+
+    # Add the user and addr if they are set
+    if [[ -n "$USER" ]] && [[ -n "$ADDR" ]]; then
+      SSH_COMMAND="$SSH_COMMAND $USER@$ADDR"
+    fi
+
+    # Print the ssh command
+    echo "SSH_COMMAND: $SSH_COMMAND"
+
+
+    # Ask user if they want to run the SSH command
+    read -p "Do you want to run the SSH command? (y/n): " RUN_COMMAND
+    if [[ "$RUN_COMMAND" == "y" ]]; then
+      # Execute the ssh command
+      eval $SSH_COMMAND
+    else
+      echo "SSH command not executed."
+    fi
+
+    # Exit
+    exit 0
+  fi
+done
+
