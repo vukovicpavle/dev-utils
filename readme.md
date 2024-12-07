@@ -25,7 +25,7 @@ Contributions are welcome! If you'd like to help improve this project, here's ho
 5. Push to the branch (`git push origin feature/improvement`)
 6. Create a Pull Request
 
-Please make sure to update tests as appropriate and follow the existing code style. For major changes, please open an issue first to discuss what you would like to change.
+For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
 
