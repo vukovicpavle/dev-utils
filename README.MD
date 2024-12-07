@@ -4,9 +4,9 @@ A collection of useful bash scripts for development workflow automation.
 
 ## Available Scripts
 
-- [`remote`](docs/remote.md) - SSH Connection Manager
 - [`gcu`](docs/gcu.md) - Git Change User
 - [`gitget`](docs/gitget.md) - Git Repository Branch Getter
+- [`remote`](docs/remote.md) - SSH Connection Manager
 - [`setex`](docs/setex.md) - Executable Permission Setter
 
 ## Installation
