@@ -210,12 +210,71 @@ function show_help() {
     echo "  edit          Edit an existing remote"
     echo "  list, ls      List all remotes"
     echo "  help          Show this help message (default)"
+    echo "  backup        Backup remotes to timestamped file"
+    echo "  test          Test connection to a remote"
+    echo "  search        Search through remotes"
+    echo "  import        Import remotes from another file"
 }
 
 # Function to list remotes
 function list_remotes() {
     echo "Available connections:"
     grep '^conn:' "$CONNECTIONS_FILE" | cut -d' ' -f2-
+}
+
+# Function to backup remotes
+function backup_remotes() {
+    BACKUP_FILE="$SSH_DIR/remotes_backup_$(date +%Y%m%d_%H%M%S)"
+    cp "$CONNECTIONS_FILE" "$BACKUP_FILE"
+    echo "Backup created at: $BACKUP_FILE"
+}
+
+# Function to test a remote connection
+function test_remote() {
+    # List and select connection similar to connect_remote
+    CONNECTIONS=($(cat $CONNECTIONS_FILE | grep '^conn:' | cut -d' ' -f2-))
+    
+    echo "Select a connection to test:"
+    select CONNECTION in "${CONNECTIONS[@]}"; do
+        if [[ -n "$CONNECTION" ]]; then
+            # Get connection details (similar to connect_remote)
+            ADDR=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; print $2}' "$CONNECTIONS_FILE")
+            PORT=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; print $2}' "$CONNECTIONS_FILE")
+            USER=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; getline; print $2}' "$CONNECTIONS_FILE")
+            PKEY=$(awk -v conn="$CONNECTION" -F': ' '$0 ~ "^conn: " conn {getline; getline; getline; getline; getline; print $2}' "$CONNECTIONS_FILE")
+
+            # Build test command
+            TEST_COMMAND="ssh -o ConnectTimeout=5 -o BatchMode=yes"
+            [[ -n "$PKEY" ]] && TEST_COMMAND="$TEST_COMMAND -i $SSH_DIR/$PKEY"
+            [[ -n "$PORT" ]] && TEST_COMMAND="$TEST_COMMAND -p $PORT"
+            TEST_COMMAND="$TEST_COMMAND $USER@$ADDR exit"
+
+            echo "Testing connection to $CONNECTION..."
+            if eval $TEST_COMMAND >/dev/null 2>&1; then
+                echo "✅ Connection successful!"
+            else
+                echo "❌ Connection failed!"
+            fi
+            break
+        fi
+    done
+}
+
+# Function to search remotes
+function search_remotes() {
+    read -p "Enter search term: " SEARCH_TERM
+    echo "Matching connections:"
+    awk -v search="$SEARCH_TERM" '
+        /^conn:/ {
+            conn=$0
+            getline addr
+            getline port
+            getline user
+            if (tolower(conn) ~ tolower(search) || tolower(addr) ~ tolower(search) || tolower(user) ~ tolower(search)) {
+                print conn
+            }
+        }
+    ' "$CONNECTIONS_FILE"
 }
 
 # Main command parser
